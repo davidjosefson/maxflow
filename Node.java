@@ -5,14 +5,13 @@ package Maxflow;
  */
 public class Node {
     int value;
-    //Node pointer;
     boolean traveled;
-    int capacity;
+    boolean isXnode;
 
-    public Node(int value) {
+    public Node(int value, boolean isXnode) {
         this.value = value;
+        this.isXnode = isXnode;
         traveled = false;
-        capacity = 1;
     }
 
 }
