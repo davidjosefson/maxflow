@@ -44,10 +44,13 @@ public class MaxFlowCounter {
         input[4][0] = 3;
         input[4][1] = 2;
 
+        //A list of all nodes in one axis, startnode, xnodes, ynodes and sinknode
         nodeArray = new ArrayList<Node>();
 
+        //Add a startnode
         nodeArray.add(new Node(-1, false));
 
+        //Fill the list with xnodes and ynodes
         for(int[] i : input){
             if (i == input[0])
                 continue;
@@ -74,14 +77,15 @@ public class MaxFlowCounter {
 
         }
 
+        //Add a sinknode to the list of nodes
         nodeArray.add(new Node(-1, false));
 
 
 
-
+        //The matrix of capacity for each edge, is symmetrical and each side is the size of nodeArray
         CapacityGraph = new int[nodeArray.size()][nodeArray.size()];
 
-        //Loopa igenom input igen för att fylla matrisen med 1:or
+        //Loop through the input-list and set the corresponding edges to 1 in the matrix
         for (int i1 = 0, inputLength = input.length; i1 < inputLength; i1++) {
             int[] i = input[i1];
             if (i == input[0])
