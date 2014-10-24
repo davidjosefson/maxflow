@@ -29,7 +29,7 @@ public class MaxFlowCounter {
     private void testmetuud(){
 
         int[][] input = new int[5][2];
-        input[0][0] = 4;
+        input[0][0] = 4; 
         input[0][1] = 0;
 
         input[1][0] = 1;
@@ -59,10 +59,10 @@ public class MaxFlowCounter {
             boolean yIsFound = false;
             for (Node node: nodeArray){
 
-                if((node.value == i[0] && node.isXnode == true)) {
+                if((node.value == i[0] && node.isXnode)) {
                     xIsFound = true;
                 }
-                if((node.value == i[1] && node.isXnode == false)) {
+                if((node.value == i[1] && !node.isXnode)) {
                     yIsFound = true;
                 }
 
@@ -86,16 +86,17 @@ public class MaxFlowCounter {
         CapacityGraph = new int[nodeArray.size()][nodeArray.size()];
 
         //Loop through the input-list and set the corresponding edges to 1 in the matrix
-        for (int i1 = 0, inputLength = input.length; i1 < inputLength; i1++) {
-            int[] i = input[i1];
-            if (i == input[0])
+        for (int i = 0; i < input.length; i++) {
+            int[] inputRow = input[i];
+
+            if (inputRow == input[0])
                 continue;
 
             int xIndex = -4;
 
             //Hitta index där x-noden är i nodeArray
             for (int j = 0; j < nodeArray.size(); j++) {
-                if(nodeArray.get(j).value == i[0] && nodeArray.get(j).isXnode ) {
+                if(nodeArray.get(j).value == inputRow[0] && nodeArray.get(j).isXnode ) {
                     xIndex = j;
                     break;
                 }
@@ -104,7 +105,7 @@ public class MaxFlowCounter {
             int yIndex = -4;
             //Hitta index där y-noden är i nodeArray
             for (int j = 0; j < nodeArray.size(); j++) {
-                if(nodeArray.get(j).value == i[0] && !nodeArray.get(j).isXnode ) {
+                if(nodeArray.get(j).value == inputRow[0] && !nodeArray.get(j).isXnode ) {
                     yIndex = j;
                     break;
                 }
