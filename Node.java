@@ -5,13 +5,13 @@ package Maxflow;
  */
 public class Node {
     int value;
-    boolean traveled;
     boolean isXnode;
+    boolean isStartOrSink;
 
-    public Node(int value, boolean isXnode) {
+    public Node(int value, boolean isXnode, boolean isStartOrSink) {
         this.value = value;
         this.isXnode = isXnode;
-        traveled = false;
+        this.isStartOrSink = isStartOrSink;
     }
 
 }
