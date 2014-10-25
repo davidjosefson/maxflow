@@ -18,16 +18,17 @@ public class MaxFlowCounter {
     ArrayList<Node> yNodes;
     ArrayList<Node> nodeArray;
 
+    Stack<Node> traveledStack;
+    Stack<Edge> pathStack;
+
     public MaxFlowCounter() {
+        traveledStack = new Stack<Node>();
+        pathStack = new Stack<Edge>();
         testmetuud();
     }
 
 
 
-    private void findPath(Edge current) {
-
-
-    }
     private void testmetuud(){
 
         int[][] input = new int[10][2];
@@ -163,13 +164,58 @@ public class MaxFlowCounter {
 
         System.out.println();
 
-        System.out.println("Printa flow före sök:");
-        printThatShit(FlowGraph);
-        System.out.println();
-
-        Stack<Edge> path = DFS();
-        ArrayList<Stack<Edge>> maxFlow = new ArrayList<Stack<Edge>>();
+        //Stack<Edge> path = DFS();
+        //ArrayList<Stack<Edge>> maxFlow = new ArrayList<Stack<Edge>>();
         int c = 1;
+
+        //New code
+
+
+        //DFS returns null if no path is found
+        while(DFS(nodeArray.get(0)) != null) {
+            for(Edge edge : pathStack) {
+                int u = -4;
+
+                //Hitta index där x-noden är i nodeArray
+                for (int j = 0; j < nodeArray.size(); j++) {
+                    if(nodeArray.get(j) == edge.x) {
+                        u = j;
+                        break;
+                    }
+                }
+
+                int v = -4;
+                //Hitta index där y-noden är i nodeArray
+                for (int j = 0; j < nodeArray.size(); j++) {
+                    if(nodeArray.get(j) == edge.y) {
+                        v = j;
+                        break;
+                    }
+                }
+
+                //Set flow
+                FlowGraph[u][v] = FlowGraph[u][v] + c;
+                FlowGraph[v][u] = -FlowGraph[u][v];
+
+                System.out.println("Printar flow efter varje pathfind: ");
+                printThatShit(FlowGraph);
+            }
+
+            //maxFlow.add(pathStack);
+            pathStack = new Stack<Edge>();
+            traveledStack = new Stack<Node>();
+        }
+
+        printThatShit(FlowGraph);
+        presentThatShit();
+
+        /* Old code
+        Stack<Edge> actualMaxFlow = new Stack<Edge>();
+        for(Stack<Edge> newpath : maxFlow) {
+            newpath.pop();
+            actualMaxFlow.push(newpath.pop());
+        }
+
 
 
         while(path != null) {
@@ -214,11 +260,58 @@ public class MaxFlowCounter {
             newpath.pop();
             actualMaxFlow.push(newpath.pop());
         }
-
+        */
 
     }
 
+    //Recursive DFS
+    private Node DFS(Node node){
+        //Stack for all the children of this node (possible paths to sinknode)
+        Stack<Node> nodesToSearch = new Stack<Node>();
 
+        //Mark this node as traveled
+        traveledStack.push(node);
+
+        int[] capRow = CapacityGraph[nodeArray.indexOf(node)] ;
+        int[] flowRow = FlowGraph[nodeArray.indexOf(node)] ;
+
+        //Loop through the row and add all children (where there is a 1)
+        for (int i = 0; i < capRow.length; i++) {
+            // Make sure there is an edge between nodes and that there is no flow.
+            if(capRow[i] == 1 && flowRow[i] < 1) {
+                //Check if node is not already traveled
+                if(!traveledStack.contains(nodeArray.get(i))) {
+                    //Add node to nodesToSearch-stack
+                    nodesToSearch.push(nodeArray.get(i));
+                }
+            }
+        }
+
+
+        if(!nodesToSearch.isEmpty()){
+            //If the sinknode is a child of this node, a path has been found
+            if(nodesToSearch.peek() == nodeArray.get(nodeArray.size() -1)) {
+                //save the edge from this node to sinknode
+                Edge edge = new Edge(node, nodesToSearch.pop());
+                pathStack.push(edge);
+                return node;
+            }
+        }
+
+
+        while (!nodesToSearch.empty()){
+            //Recursive call to search from child of this node
+            Node childNode = DFS(nodesToSearch.pop());
+            if (childNode != null) {
+                Edge edge = new Edge(node, childNode);
+                pathStack.push(edge);
+                return node;
+            }
+
+        }
+
+        return null;
+    }
 
     private void printThatShit(int[][] array) {
         String out = "   ";
@@ -261,6 +354,7 @@ public class MaxFlowCounter {
         System.out.println(out);
     }
 
+    /* Old, non-recursive DFS
     private Stack<Edge> DFS(){
         Stack<Node> nodesToSearch = new Stack<Node>();
         Stack<Node> traveled = new Stack<Node>();
@@ -307,4 +401,8 @@ public class MaxFlowCounter {
         return null;
 
     }
+
+*/
 }
+
+
