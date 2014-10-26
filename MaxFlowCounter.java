@@ -31,8 +31,8 @@ public class MaxFlowCounter {
 
     private void testmetuud(){
 
-        int[][] input = new int[10][2];
-        /*input[0][0] = 4;
+        int[][] input = new int[5][2];
+        input[0][0] = 4;
         input[0][1] = 0;
 
         input[1][0] = 1;
@@ -45,9 +45,9 @@ public class MaxFlowCounter {
         input[3][1] = 2;
 
         input[4][0] = 3;
-        input[4][1] = 3;*/
+        input[4][1] = 3;
 
-        input[0][0] = 9;
+        /*input[0][0] = 9;
         input[0][1] = 0;
 
         input[1][0] = 1;
@@ -76,7 +76,7 @@ public class MaxFlowCounter {
 
         //Extra
         input[9][0] = 2;
-        input[9][1] = 5;
+        input[9][1] = 5;*/
 
         //A list of all nodes in one axis, startnode, xnodes, ynodes and sinknode
         nodeArray = new ArrayList<Node>();
