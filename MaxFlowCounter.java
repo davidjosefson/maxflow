@@ -1,3 +1,13 @@
+/*
+TODO: Göra hela grejen till en static som inte behöver instansieras?
+    TODO: Skicka in en input-2d-array och få ut FlowGraph?
+    TODO: Ha två public print-metoder som man kan anropa där man skickar in den färdiga flowgraphen för att skriva ut resultatet?
+TODO: Dela upp i fler metoder, inte bara en som körs rakt upp och ner
+TODO: Optimera koden? Städa?
+TODO: Kommentarer, gah..
+
+*/
+
 package Maxflow;
 
 import com.sun.tools.javac.comp.Flow;
@@ -14,70 +24,18 @@ public class MaxFlowCounter {
 
     int[][] CapacityGraph;
     int[][] FlowGraph;
-    ArrayList<Node> xNodes;
-    ArrayList<Node> yNodes;
     ArrayList<Node> nodeArray;
 
     Stack<Node> traveledStack;
     Stack<Edge> pathStack;
 
-    public MaxFlowCounter() {
+    public MaxFlowCounter(int[][] input) {
         traveledStack = new Stack<Node>();
         pathStack = new Stack<Edge>();
-        testmetuud();
+        testmetuud(input);
     }
 
-
-
-    private void testmetuud(){
-
-        int[][] input = new int[5][2];
-        input[0][0] = 4;
-        input[0][1] = 0;
-
-        input[1][0] = 1;
-        input[1][1] = 2;
-
-        input[2][0] = 2;
-        input[2][1] = 1;
-
-        input[3][0] = 2;
-        input[3][1] = 2;
-
-        input[4][0] = 3;
-        input[4][1] = 3;
-
-        /*input[0][0] = 9;
-        input[0][1] = 0;
-
-        input[1][0] = 1;
-        input[1][1] = 2;
-
-        input[2][0] = 1;
-        input[2][1] = 3;
-
-        input[3][0] = 3;
-        input[3][1] = 1;
-
-        input[4][0] = 3;
-        input[4][1] = 4;
-
-        input[5][0] = 4;
-        input[5][1] = 3;
-
-        input[6][0] = 5;
-        input[6][1] = 3;
-
-        input[7][0] = 5;
-        input[7][1] = 4;
-
-        input[8][0] = 6;
-        input[8][1] = 6;
-
-        //Extra
-        input[9][0] = 2;
-        input[9][1] = 5;*/
-
+    private void testmetuud(int[][] input){
         //A list of all nodes in one axis, startnode, xnodes, ynodes and sinknode
         nodeArray = new ArrayList<Node>();
 
@@ -164,12 +122,7 @@ public class MaxFlowCounter {
 
         System.out.println();
 
-        //Stack<Edge> path = DFS();
-        //ArrayList<Stack<Edge>> maxFlow = new ArrayList<Stack<Edge>>();
         int c = 1;
-
-        //New code
-
 
         //DFS returns null if no path is found
         while(DFS(nodeArray.get(0)) != null) {
@@ -208,60 +161,6 @@ public class MaxFlowCounter {
 
         printThatShit(FlowGraph);
         presentThatShit();
-
-        /* Old code
-        Stack<Edge> actualMaxFlow = new Stack<Edge>();
-        for(Stack<Edge> newpath : maxFlow) {
-            newpath.pop();
-            actualMaxFlow.push(newpath.pop());
-        }
-
-
-
-        while(path != null) {
-            for(Edge edge : path) {
-                int u = -4;
-
-                //Hitta index där x-noden är i nodeArray
-                for (int j = 0; j < nodeArray.size(); j++) {
-                    if(nodeArray.get(j) == edge.x) {
-                        u = j;
-                        break;
-                    }
-                }
-
-                int v = -4;
-                //Hitta index där y-noden är i nodeArray
-                for (int j = 0; j < nodeArray.size(); j++) {
-                    if(nodeArray.get(j) == edge.y) {
-                        v = j;
-                        break;
-                    }
-                }
-
-
-                FlowGraph[u][v] = FlowGraph[u][v] + c;
-                FlowGraph[v][u] = -FlowGraph[u][v];
-
-                System.out.println("Printar flow efter varje pathfind: ");
-                printThatShit(FlowGraph);
-            }
-
-            //OBS! NÄR ALLT GÅTTS IGENOM SKA MAN ANROPA EN METUUD FÖR ATT RÄKNA ALLA 1:or I FLOWGRAPH = MAXFLOW!!
-            maxFlow.add(path);
-            path = DFS();
-        }
-
-        printThatShit(FlowGraph);
-        presentThatShit();
-
-        Stack<Edge> actualMaxFlow = new Stack<Edge>();
-        for(Stack<Edge> newpath : maxFlow) {
-            newpath.pop();
-            actualMaxFlow.push(newpath.pop());
-        }
-        */
-
     }
 
     //Recursive DFS
@@ -353,56 +252,6 @@ public class MaxFlowCounter {
 
         System.out.println(out);
     }
-
-    /* Old, non-recursive DFS
-    private Stack<Edge> DFS(){
-        Stack<Node> nodesToSearch = new Stack<Node>();
-        Stack<Node> traveled = new Stack<Node>();
-
-        Stack<Edge> path = new Stack<Edge>();
-
-        nodesToSearch.push(nodeArray.get(0));
-
-        Node node = null;
-
-        while (!nodesToSearch.empty()){
-            if(node != null && !nodesToSearch.empty()) {
-                Edge edge = new Edge(node, nodesToSearch.peek());
-                path.push(edge);
-            }
-
-            //Stack to search
-            node = nodesToSearch.pop();
-
-            //Path from startNode to sinkNode
-            traveled.push(node);
-
-            //If node is sinkNode, stop
-            if(node == nodeArray.get(nodeArray.size() - 1)) {
-                return path;
-            }
-
-            int[] capRow = CapacityGraph[nodeArray.indexOf(node)] ;
-            int[] flowRow = FlowGraph[nodeArray.indexOf(node)] ;
-
-            //Loop through the row and add all children (where there is a 1)
-            for (int i = 0; i < capRow.length; i++) {
-                if(capRow[i] == 1 && flowRow[i] < 1) {
-                    //Check if node is not already traveled
-                    if(!traveled.contains(nodeArray.get(i)) && !nodesToSearch.contains(nodeArray.get(i))) {
-                        //Add node to nodesToSearch-stack
-                        nodesToSearch.push(nodeArray.get(i));
-                    }
-                }
-            }
-        }
-
-        //If no path was found return null
-        return null;
-
-    }
-
-*/
 }
 
 

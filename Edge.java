@@ -7,8 +7,6 @@ public class Edge {
     Node x;
     Node y;
     int flow;
-    int capacity;
-    int residualCapacity;
 
     public Edge(Node firstNode, Node secondNode){
         /* if(firstNode.isXnode) {

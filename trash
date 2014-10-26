@@ -1,0 +1,104 @@
+
+        /* Old code
+        Stack<Edge> actualMaxFlow = new Stack<Edge>();
+        for(Stack<Edge> newpath : maxFlow) {
+            newpath.pop();
+            actualMaxFlow.push(newpath.pop());
+        }
+
+
+
+        while(path != null) {
+            for(Edge edge : path) {
+                int u = -4;
+
+                //Hitta index där x-noden är i nodeArray
+                for (int j = 0; j < nodeArray.size(); j++) {
+                    if(nodeArray.get(j) == edge.x) {
+                        u = j;
+                        break;
+                    }
+                }
+
+                int v = -4;
+                //Hitta index där y-noden är i nodeArray
+                for (int j = 0; j < nodeArray.size(); j++) {
+                    if(nodeArray.get(j) == edge.y) {
+                        v = j;
+                        break;
+                    }
+                }
+
+
+                FlowGraph[u][v] = FlowGraph[u][v] + c;
+                FlowGraph[v][u] = -FlowGraph[u][v];
+
+                System.out.println("Printar flow efter varje pathfind: ");
+                printThatShit(FlowGraph);
+            }
+
+            //OBS! NÄR ALLT GÅTTS IGENOM SKA MAN ANROPA EN METUUD FÖR ATT RÄKNA ALLA 1:or I FLOWGRAPH = MAXFLOW!!
+            maxFlow.add(path);
+            path = DFS();
+        }
+
+        printThatShit(FlowGraph);
+        presentThatShit();
+
+        Stack<Edge> actualMaxFlow = new Stack<Edge>();
+        for(Stack<Edge> newpath : maxFlow) {
+            newpath.pop();
+            actualMaxFlow.push(newpath.pop());
+        }
+        */
+
+
+    /* Old, non-recursive DFS
+    private Stack<Edge> DFS(){
+        Stack<Node> nodesToSearch = new Stack<Node>();
+        Stack<Node> traveled = new Stack<Node>();
+
+        Stack<Edge> path = new Stack<Edge>();
+
+        nodesToSearch.push(nodeArray.get(0));
+
+        Node node = null;
+
+        while (!nodesToSearch.empty()){
+            if(node != null && !nodesToSearch.empty()) {
+                Edge edge = new Edge(node, nodesToSearch.peek());
+                path.push(edge);
+            }
+
+            //Stack to search
+            node = nodesToSearch.pop();
+
+            //Path from startNode to sinkNode
+            traveled.push(node);
+
+            //If node is sinkNode, stop
+            if(node == nodeArray.get(nodeArray.size() - 1)) {
+                return path;
+            }
+
+            int[] capRow = CapacityGraph[nodeArray.indexOf(node)] ;
+            int[] flowRow = FlowGraph[nodeArray.indexOf(node)] ;
+
+            //Loop through the row and add all children (where there is a 1)
+            for (int i = 0; i < capRow.length; i++) {
+                if(capRow[i] == 1 && flowRow[i] < 1) {
+                    //Check if node is not already traveled
+                    if(!traveled.contains(nodeArray.get(i)) && !nodesToSearch.contains(nodeArray.get(i))) {
+                        //Add node to nodesToSearch-stack
+                        nodesToSearch.push(nodeArray.get(i));
+                    }
+                }
+            }
+        }
+
+        //If no path was found return null
+        return null;
+
+    }
+
+*/
