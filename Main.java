@@ -1,9 +1,6 @@
 package Maxflow;
 
 public class Main {
-
-    private static int[][] input;
-
     public static void main(String[] args) {
 
         int[][] input1 = new int[5][2];
@@ -57,6 +54,10 @@ public class Main {
 
         MaxFlowCounter test1 = new MaxFlowCounter(input1);
         MaxFlowCounter test2 = new MaxFlowCounter(input2);
+
+        System.out.println(test1.toString());
+
+        System.out.println(test2.toString());
 
 
     }

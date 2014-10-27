@@ -32,14 +32,6 @@ public class MaxFlowCounter {
 
         ConvertInputToGraph(input);
         MaxFlowFulkerson();
-
-        System.out.println("Capacity matrix");
-        printThatShit(CapacityGraph);
-
-        System.out.println("Flow matrix");
-        printThatShit(FlowGraph);
-
-        presentThatShit();
     }
 
     private void ConvertInputToGraph(int[][] input) {
@@ -189,7 +181,6 @@ public class MaxFlowCounter {
             }
         }
 
-
         if(!nodesToSearch.isEmpty()){
             //If the sink-node is a child of this node, a path has been found
             if(nodesToSearch.peek() == nodeArray.get(nodeArray.size() -1)) {
@@ -213,19 +204,39 @@ public class MaxFlowCounter {
         return null;
     }
 
+    public String toString() {
+        String out = "";
+
+        out += "Capacity matrix: \n";
+        out += printThatShit(CapacityGraph);
+        out += "\n";
+
+        out += "Flow matrix: \n";
+        out += printThatShit(FlowGraph);
+        out += "\n";
+
+        out += presentThatShit();
+
+        return out;
+    }
+
     /**
      * Prints the matrix of graph @param
      * @param array Graph to print
      */
-    private void printThatShit(int[][] array) {
+    private String printThatShit(int[][] array) {
         String out = "   ";
+
+        //Prints first row with node-names as columns
         for(int i = 0; i < nodeArray.size(); i++) {
             if(nodeArray.get(i).isXnode)
                 out += "u" + nodeArray.get(i).value + " ";
             else
                 out += "v" + nodeArray.get(i).value + " ";
         }
-        System.out.println(out);
+        out += "\n";
+
+        //Prints matrix (with node-names as rows)
         for (int i = 0; i < array.length; i++) {
             String m = "";
 
@@ -240,32 +251,36 @@ public class MaxFlowCounter {
                 else
                     m += " " + array[i][j] + " ";
             }
-            System.out.println(m);
+            out += m + "\n";
         }
-        System.out.println();
+
+        return out;
     }
 
     /**
      * Call this function after MaxFlowFulkerson()
      * Presents the result from MaxFlowFulkerson()
      */
-    private void presentThatShit() {
+    private String presentThatShit() {
         String out = "";
+        String edges = "";
+
         int MaximumMatching = 0;
         for(int i = 0; i < FlowGraph.length; i++) {
             for (int j = 0; j < FlowGraph[i].length; j++) {
                 if(FlowGraph[i][j] == 1) {
                     if(!(nodeArray.get(i).isStartOrSink || nodeArray.get(j).isStartOrSink)) {
-                        out += "(" + nodeArray.get(i).value + ", " + nodeArray.get(j).value + ") \n";
+                        edges += "(" + nodeArray.get(i).value + ", " + nodeArray.get(j).value + ") \n";
                         MaximumMatching ++;
                     }
                 }
             }
         }
-        System.out.println();
-        System.out.println("Maximum matching is: " + MaximumMatching);
-        System.out.println("and the edges are the following:" );
-        System.out.println(out);
+
+        out += "\nMaximum matching is: " + MaximumMatching + "\nand the edges are the following:\n";
+        out += edges;
+
+        return out;
     }
 
 }
