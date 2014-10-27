@@ -47,7 +47,7 @@ public class MaxFlowCounter {
         nodeArray = new ArrayList<Node>();
 
         //Add a startnode
-        nodeArray.add(new Node(7, false, true));
+        nodeArray.add(new Node(0, false, true));
 
         //Fill the list with u-nodes and v-nodes
         for(int[] i : input){
@@ -59,10 +59,10 @@ public class MaxFlowCounter {
             boolean vIsFound = false;
             for (Node node: nodeArray){
 
-                if((node.value == i[0] && node.isXnode)) {
+                if((node.value == i[0] && node.isXnode && !node.isStartOrSink)) {
                     uIsFound = true;
                 }
-                if((node.value == i[1] && !node.isXnode)) {
+                if((node.value == i[1] && !node.isXnode && !node.isStartOrSink)) {
                     vIsFound = true;
                 }
 
@@ -78,7 +78,7 @@ public class MaxFlowCounter {
         }
 
         //Add a sink-node to the list of nodes
-        nodeArray.add(new Node(9, true, true));
+        nodeArray.add(new Node(0, true, true));
 
         //The matrix of capacity for each edge, is symmetrical and each side is the size of nodeArray
         CapacityGraph = new int[nodeArray.size()][nodeArray.size()];
@@ -255,7 +255,7 @@ public class MaxFlowCounter {
         for(int i = 0; i < FlowGraph.length; i++) {
             for (int j = 0; j < FlowGraph[i].length; j++) {
                 if(FlowGraph[i][j] == 1) {
-                    if(!(nodeArray.get(i).value == 7 || nodeArray.get(i).value == 9 || nodeArray.get(j).value == 7 || nodeArray.get(j).value == 9)) {
+                    if(!(nodeArray.get(i).isStartOrSink || nodeArray.get(j).isStartOrSink)) {
                         out += "(" + nodeArray.get(i).value + ", " + nodeArray.get(j).value + ") \n";
                         MaximumMatching ++;
                     }
