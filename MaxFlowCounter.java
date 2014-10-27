@@ -132,38 +132,22 @@ public class MaxFlowCounter {
 
 
     private void MaxFlowFulkerson(){
-
         //Capacity will always be 1 if there is an edge in the Bipartite maximum matching problem
         int c = 1;
 
         //DFS returns null if no path is found
         while(DFS(nodeArray.get(0)) != null) {
             for(Edge edge : pathStack) {
-
-                int u = 0;
-                //Find index of u-node from nodeArray
-                for (int j = 0; j < nodeArray.size(); j++) {
-                    if(nodeArray.get(j) == edge.firstNode) {
-                        u = j;
-                        break;
-                    }
-                }
-
-                int v = 0;
-                //Find index of v-node from nodeArray
-                for (int j = 0; j < nodeArray.size(); j++) {
-                    if(nodeArray.get(j) == edge.secondNode) {
-                        v = j;
-                        break;
-                    }
-                }
+                //Find index of u and v-nodes from nodeArray
+                int u = nodeArray.indexOf(edge.firstNode);
+                int v = nodeArray.indexOf(edge.secondNode);
 
                 //Set flow
                 FlowGraph[u][v] = FlowGraph[u][v] + c;
                 FlowGraph[v][u] = -FlowGraph[u][v];
-
             }
-
+            //Reset the instance variables pathStack and traveledStack before next
+            //path-search in the while loop
             pathStack = new Stack<Edge>();
             traveledStack = new Stack<Node>();
         }
