@@ -10,8 +10,6 @@ TODO: Kommentarer, gah..
 
 package Maxflow;
 
-import com.sun.tools.javac.comp.Flow;
-
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -21,55 +19,65 @@ import java.util.Stack;
  */
 public class MaxFlowCounter {
 
+    private int[][] CapacityGraph;
+    private int[][] FlowGraph;
+    private ArrayList<Node> nodeArray;
+    private Stack<Node> traveledStack;
+    private Stack<Edge> pathStack;
 
-    int[][] CapacityGraph;
-    int[][] FlowGraph;
-    ArrayList<Node> nodeArray;
-
-    Stack<Node> traveledStack;
-    Stack<Edge> pathStack;
 
     public MaxFlowCounter(int[][] input) {
         traveledStack = new Stack<Node>();
         pathStack = new Stack<Edge>();
-        testmetuud(input);
+
+        ConvertInputToGraph(input);
+        MaxFlowFulkerson();
+
+        System.out.println("Capacity matrix");
+        printThatShit(CapacityGraph);
+
+        System.out.println("Flow matrix");
+        printThatShit(FlowGraph);
+
+        presentThatShit();
     }
 
-    private void testmetuud(int[][] input){
-        //A list of all nodes in one axis, startnode, xnodes, ynodes and sinknode
+    private void ConvertInputToGraph(int[][] input) {
+        //A list of all nodes in one axis, startnode, u-nodes, v-nodes and sinknode
         nodeArray = new ArrayList<Node>();
 
         //Add a startnode
         nodeArray.add(new Node(7, false, true));
 
-        //Fill the list with xnodes and ynodes
+        //Fill the list with u-nodes and v-nodes
         for(int[] i : input){
+            //Skip the row with amount of edges
             if (i == input[0])
                 continue;
 
-            boolean xIsFound = false;
-            boolean yIsFound = false;
+            boolean uIsFound = false;
+            boolean vIsFound = false;
             for (Node node: nodeArray){
 
                 if((node.value == i[0] && node.isXnode)) {
-                    xIsFound = true;
+                    uIsFound = true;
                 }
                 if((node.value == i[1] && !node.isXnode)) {
-                    yIsFound = true;
+                    vIsFound = true;
                 }
 
-                if(xIsFound && yIsFound)
+                if(uIsFound && vIsFound)
                     break;
             }
 
-            if(!xIsFound)
+            if(!uIsFound)
                 nodeArray.add(new Node(i[0], true, false));
-            if(!yIsFound)
+            if(!vIsFound)
                 nodeArray.add(new Node(i[1], false, false));
 
         }
 
-        //Add a sinknode to the list of nodes
+        //Add a sink-node to the list of nodes
         nodeArray.add(new Node(9, true, true));
 
         //The matrix of capacity for each edge, is symmetrical and each side is the size of nodeArray
@@ -82,65 +90,69 @@ public class MaxFlowCounter {
         for (int i = 0; i < input.length; i++) {
             int[] inputRow = input[i];
 
+            //Skip the row with amount of edges
             if (inputRow == input[0])
                 continue;
 
-            int xIndex = -4;
+            int u = 0;
 
-            //Hitta index där x-noden är i nodeArray
+            //Find index of u-node from nodeArray
             for (int j = 0; j < nodeArray.size(); j++) {
                 if(nodeArray.get(j).value == inputRow[0] && nodeArray.get(j).isXnode ) {
-                    xIndex = j;
+                    u = j;
                     break;
                 }
             }
 
-            int yIndex = -4;
-            //Hitta index där y-noden är i nodeArray
+            int v = 0;
+
+            //Find index of v-node from nodeArray
             for (int j = 0; j < nodeArray.size(); j++) {
                 if(nodeArray.get(j).value == inputRow[1] && !nodeArray.get(j).isXnode ) {
-                    yIndex = j;
+                    v = j;
                     break;
                 }
             }
 
+            //set the edge to 1
+            CapacityGraph[v][u] = 1;
+            CapacityGraph[u][v] = 1;
 
-            CapacityGraph[yIndex][xIndex] = 1;
-            CapacityGraph[xIndex][yIndex] = 1;
+            //Set startNode to u-node edge to 1 on both y-axis and x-axis
+            CapacityGraph[0][u] = 1;
+            CapacityGraph[u][0] = 1;
 
-            //Set startNode to x-node edge to 1 on both y-axis and x-axis
-            CapacityGraph[0][xIndex] = 1;
-            CapacityGraph[xIndex][0] = 1;
-
-            //Set sinkNode to Y-node edge to 1 on both y-axis and x-axis
-            CapacityGraph[CapacityGraph.length - 1][yIndex] = 1;
-            CapacityGraph[yIndex][CapacityGraph.length - 1] = 1;
+            //Set sinkNode to v-node edge to 1 on both y-axis and x-axis
+            CapacityGraph[CapacityGraph.length - 1][v] = 1;
+            CapacityGraph[v][CapacityGraph.length - 1] = 1;
 
         }
-        System.out.println("Printar capacity");
-        printThatShit(CapacityGraph);
 
-        System.out.println();
+    }
 
+
+    private void MaxFlowFulkerson(){
+
+        //Capacity will always be 1 if there is an edge in the Bipartite maximum matching problem
         int c = 1;
 
         //DFS returns null if no path is found
         while(DFS(nodeArray.get(0)) != null) {
             for(Edge edge : pathStack) {
-                int u = -4;
 
-                //Hitta index där x-noden är i nodeArray
+                int u = 0;
+                //Find index of u-node from nodeArray
                 for (int j = 0; j < nodeArray.size(); j++) {
-                    if(nodeArray.get(j) == edge.x) {
+                    if(nodeArray.get(j) == edge.firstNode) {
                         u = j;
                         break;
                     }
                 }
 
-                int v = -4;
-                //Hitta index där y-noden är i nodeArray
+                int v = 0;
+                //Find index of v-node from nodeArray
                 for (int j = 0; j < nodeArray.size(); j++) {
-                    if(nodeArray.get(j) == edge.y) {
+                    if(nodeArray.get(j) == edge.secondNode) {
                         v = j;
                         break;
                     }
@@ -150,20 +162,27 @@ public class MaxFlowCounter {
                 FlowGraph[u][v] = FlowGraph[u][v] + c;
                 FlowGraph[v][u] = -FlowGraph[u][v];
 
-                System.out.println("Printar flow efter varje pathfind: ");
-                printThatShit(FlowGraph);
             }
 
-            //maxFlow.add(pathStack);
             pathStack = new Stack<Edge>();
             traveledStack = new Stack<Node>();
         }
 
-        printThatShit(FlowGraph);
-        presentThatShit();
     }
 
-    //Recursive DFS
+    /**
+     * This recursive implementation of depth-first search does the following:
+     * 1. Add @param node to the stack with traveled nodes.
+     * 2. Find adjacent nodes and add them to the stack with nodes to search from (nodesToSearch)
+     * 3. Check if the top node is the sink-node, which means that a path has been found
+     *      3.1 Add an edge from this node to sink-node to the stack with the edges of this path (pathStack)
+     * 4. Loop through each node in nodesToSearch
+     *      4.1 Set childNode to a recursive call of this method on the top node in nodesToSearch
+     *      4.2 If childNode is not null, it means a path has been found and an edge between this node and
+     *          childNode is to be added into pathStack
+     * @param node node to search from
+     * @return null if no path is found, otherwise the @param node
+     */
     private Node DFS(Node node){
         //Stack for all the children of this node (possible paths to sinknode)
         Stack<Node> nodesToSearch = new Stack<Node>();
@@ -188,15 +207,14 @@ public class MaxFlowCounter {
 
 
         if(!nodesToSearch.isEmpty()){
-            //If the sinknode is a child of this node, a path has been found
+            //If the sink-node is a child of this node, a path has been found
             if(nodesToSearch.peek() == nodeArray.get(nodeArray.size() -1)) {
-                //save the edge from this node to sinknode
+                //save the edge from this node to sink-node
                 Edge edge = new Edge(node, nodesToSearch.pop());
                 pathStack.push(edge);
                 return node;
             }
         }
-
 
         while (!nodesToSearch.empty()){
             //Recursive call to search from child of this node
@@ -206,28 +224,31 @@ public class MaxFlowCounter {
                 pathStack.push(edge);
                 return node;
             }
-
         }
 
         return null;
     }
 
+    /**
+     * Prints the matrix of graph @param
+     * @param array Graph to print
+     */
     private void printThatShit(int[][] array) {
         String out = "   ";
         for(int i = 0; i < nodeArray.size(); i++) {
             if(nodeArray.get(i).isXnode)
-                out += "x" + nodeArray.get(i).value + " ";
+                out += "u" + nodeArray.get(i).value + " ";
             else
-                out += "y" + nodeArray.get(i).value + " ";
+                out += "v" + nodeArray.get(i).value + " ";
         }
         System.out.println(out);
         for (int i = 0; i < array.length; i++) {
             String m = "";
 
             if(nodeArray.get(i).isXnode)
-                m += "x" + nodeArray.get(i).value + " ";
+                m += "u" + nodeArray.get(i).value + " ";
             else
-                m += "y" + nodeArray.get(i).value + " ";
+                m += "v" + nodeArray.get(i).value + " ";
 
             for (int j = 0; j < array[i].length ; j++) {
                 if(array[i][j] < 0)
@@ -237,21 +258,32 @@ public class MaxFlowCounter {
             }
             System.out.println(m);
         }
+        System.out.println();
     }
 
+    /**
+     * Call this function after MaxFlowFulkerson()
+     * Presents the result from MaxFlowFulkerson()
+     */
     private void presentThatShit() {
         String out = "";
+        int MaximumMatching = 0;
         for(int i = 0; i < FlowGraph.length; i++) {
             for (int j = 0; j < FlowGraph[i].length; j++) {
                 if(FlowGraph[i][j] == 1) {
-                    if(!(nodeArray.get(i).value == 7 || nodeArray.get(i).value == 9 || nodeArray.get(j).value == 7 || nodeArray.get(j).value == 9))
+                    if(!(nodeArray.get(i).value == 7 || nodeArray.get(i).value == 9 || nodeArray.get(j).value == 7 || nodeArray.get(j).value == 9)) {
                         out += "(" + nodeArray.get(i).value + ", " + nodeArray.get(j).value + ") \n";
+                        MaximumMatching ++;
+                    }
                 }
             }
         }
-
+        System.out.println();
+        System.out.println("Maximum matching is: " + MaximumMatching);
+        System.out.println("and the edges are the following:" );
         System.out.println(out);
     }
+
 }
 
 

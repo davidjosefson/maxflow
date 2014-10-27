@@ -1,12 +1,11 @@
 package Maxflow;
 
-import com.sun.tools.javac.util.List;
-
-import java.sql.Array;
-
 public class Main {
 
+    private static int[][] input;
+
     public static void main(String[] args) {
+
         int[][] input1 = new int[5][2];
         input1[0][0] = 4;
         input1[0][1] = 0;
@@ -58,6 +57,7 @@ public class Main {
 
         MaxFlowCounter test1 = new MaxFlowCounter(input1);
         MaxFlowCounter test2 = new MaxFlowCounter(input2);
+
 
     }
 
