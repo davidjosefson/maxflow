@@ -1,40 +1,48 @@
-/*
-TODO: Göra hela grejen till en static som inte behöver instansieras?
-    TODO: Skicka in en input-2d-array och få ut FlowGraph?
-    TODO: Ha två public print-metoder som man kan anropa där man skickar in den färdiga flowgraphen för att skriva ut resultatet?
-TODO: Dela upp i fler metoder, inte bara en som körs rakt upp och ner
-TODO: Optimera koden? Städa?
-TODO: Kommentarer, gah..
-
-*/
-
 package Maxflow;
 
 import java.util.ArrayList;
 import java.util.Stack;
 
-
 /**
- * Created by david on 20/10/14.
+ * A class which finds the maximum mathing in a bipartite graph.
+ * @author David Josefson and Elias Agetorp. Created: 2014-10-27
  */
 public class MaxFlowCounter {
-
     private int[][] CapacityGraph;
     private int[][] FlowGraph;
     private ArrayList<Node> nodeArray;
     private Stack<Node> traveledStack;
     private Stack<Edge> pathStack;
 
-
+    /**
+     * Constructor which instantiates stacks, creates graphs and finds the max flow
+     * @param input a two dimensional array of edges (node pairs)
+     */
     public MaxFlowCounter(int[][] input) {
         traveledStack = new Stack<Node>();
         pathStack = new Stack<Edge>();
 
-        ConvertInputToGraph(input);
+        createGraphs(input);
         MaxFlowFulkerson();
     }
 
-    private void ConvertInputToGraph(int[][] input) {
+    private void createGraphs(int[][] input) {
+        //Create a list of the nodes from input array
+        createNodeList(input);
+
+        //Initiate flow and capacity graph
+        CapacityGraph = new int[nodeArray.size()][nodeArray.size()];
+        FlowGraph = new int[nodeArray.size()][nodeArray.size()];
+
+        //Set capacity to 1 in capacityGraph where an edge exists
+        setCapacity(input);
+    }
+
+    /**
+     * Creates a list of nodes from the input array of edges. These nodes with will be used as a reference.
+     * @param input a two dimensional array of edges (node pairs)
+     */
+    private void createNodeList(int[][] input) {
         //A list of all nodes in one axis, startnode, u-nodes, v-nodes and sinknode
         nodeArray = new ArrayList<Node>();
 
@@ -51,10 +59,10 @@ public class MaxFlowCounter {
             boolean vIsFound = false;
             for (Node node: nodeArray){
 
-                if((node.value == i[0] && node.isXnode && !node.isStartOrSink)) {
+                if((node.value == i[0] && node.isUnode && !node.isStartOrSink)) {
                     uIsFound = true;
                 }
-                if((node.value == i[1] && !node.isXnode && !node.isStartOrSink)) {
+                if((node.value == i[1] && !node.isUnode && !node.isStartOrSink)) {
                     vIsFound = true;
                 }
 
@@ -69,15 +77,15 @@ public class MaxFlowCounter {
 
         }
 
-        //Add a sink-node to the list of nodes
+        //Add a sink-node and the end of the list
         nodeArray.add(new Node(0, true, true));
+    }
 
-        //The matrix of capacity for each edge, is symmetrical and each side is the size of nodeArray
-        CapacityGraph = new int[nodeArray.size()][nodeArray.size()];
-
-        //Create a flow path where every edge has 0 flow
-        FlowGraph = new int[nodeArray.size()][nodeArray.size()];
-
+    /**
+     * Sets capacity to 1 in the capacity graph where there is a corresponding edge in the input array of edges
+     * @param input a two dimensional array of edges (node pairs)
+     */
+    private void setCapacity(int[][] input) {
         //Loop through the input-list and set the corresponding edges to 1 in the matrix
         for (int i = 0; i < input.length; i++) {
             int[] inputRow = input[i];
@@ -90,7 +98,7 @@ public class MaxFlowCounter {
 
             //Find index of u-node from nodeArray
             for (int j = 0; j < nodeArray.size(); j++) {
-                if(nodeArray.get(j).value == inputRow[0] && nodeArray.get(j).isXnode ) {
+                if(nodeArray.get(j).value == inputRow[0] && nodeArray.get(j).isUnode) {
                     u = j;
                     break;
                 }
@@ -100,7 +108,7 @@ public class MaxFlowCounter {
 
             //Find index of v-node from nodeArray
             for (int j = 0; j < nodeArray.size(); j++) {
-                if(nodeArray.get(j).value == inputRow[1] && !nodeArray.get(j).isXnode ) {
+                if(nodeArray.get(j).value == inputRow[1] && !nodeArray.get(j).isUnode) {
                     v = j;
                     break;
                 }
@@ -119,10 +127,12 @@ public class MaxFlowCounter {
             CapacityGraph[v][CapacityGraph.length - 1] = 1;
 
         }
-
     }
 
 
+    /**
+     * Reduces the maximum bipartite matching to a maximum flow using the Ford-Fulkerson method
+     */
     private void MaxFlowFulkerson(){
         //Capacity will always be 1 if there is an edge in the Bipartite maximum matching problem
         int c = 1;
@@ -204,18 +214,22 @@ public class MaxFlowCounter {
         return null;
     }
 
+    /**
+     * Present the capacity/flow graphs and edges in the flow as a string
+     * @return result of the max flow
+     */
     public String toString() {
         String out = "";
 
         out += "Capacity matrix: \n";
-        out += printThatShit(CapacityGraph);
+        out += graphToString(CapacityGraph);
         out += "\n";
 
         out += "Flow matrix: \n";
-        out += printThatShit(FlowGraph);
+        out += graphToString(FlowGraph);
         out += "\n";
 
-        out += presentThatShit();
+        out += pathsToString();
 
         return out;
     }
@@ -224,12 +238,12 @@ public class MaxFlowCounter {
      * Prints the matrix of graph @param
      * @param array Graph to print
      */
-    private String printThatShit(int[][] array) {
+    private String graphToString(int[][] array) {
         String out = "   ";
 
         //Prints first row with node-names as columns
         for(int i = 0; i < nodeArray.size(); i++) {
-            if(nodeArray.get(i).isXnode)
+            if(nodeArray.get(i).isUnode)
                 out += "u" + nodeArray.get(i).value + " ";
             else
                 out += "v" + nodeArray.get(i).value + " ";
@@ -240,7 +254,7 @@ public class MaxFlowCounter {
         for (int i = 0; i < array.length; i++) {
             String m = "";
 
-            if(nodeArray.get(i).isXnode)
+            if(nodeArray.get(i).isUnode)
                 m += "u" + nodeArray.get(i).value + " ";
             else
                 m += "v" + nodeArray.get(i).value + " ";
@@ -261,7 +275,7 @@ public class MaxFlowCounter {
      * Call this function after MaxFlowFulkerson()
      * Presents the result from MaxFlowFulkerson()
      */
-    private String presentThatShit() {
+    private String pathsToString() {
         String out = "";
         String edges = "";
 

@@ -1,8 +1,12 @@
 package Maxflow;
 
+/**
+ * A program created for running and testing the MaxFlowCounter-class. All output is done in the console.
+ * @author David Josefson and Elias Agetorp. Created: 2014-10-27
+ */
 public class Main {
     public static void main(String[] args) {
-
+        //Create first input array
         int[][] input1 = new int[5][2];
         input1[0][0] = 4;
         input1[0][1] = 0;
@@ -19,7 +23,7 @@ public class Main {
         input1[4][0] = 3;
         input1[4][1] = 3;
 
-
+        //Create second input array
         int[][] input2 = new int[10][2];
         input2[0][0] = 9;
         input2[0][1] = 0;
@@ -48,15 +52,15 @@ public class Main {
         input2[8][0] = 6;
         input2[8][1] = 6;
 
-        //Extra
         input2[9][0] = 2;
         input2[9][1] = 5;
 
+        //Create a MaxFlow object which finds max flow and the edges
         MaxFlowCounter test1 = new MaxFlowCounter(input1);
         MaxFlowCounter test2 = new MaxFlowCounter(input2);
 
+        //Print the result
         System.out.println(test1.toString());
-
         System.out.println(test2.toString());
 
 

@@ -1,7 +1,8 @@
 package Maxflow;
 
 /**
- * Created by david on 20/10/14.
+ * A class holding pointers to two Nodes.
+ * @author David Josefson and Elias Agetorp. Created: 2014-10-27
  */
 public class Edge {
     Node firstNode;
